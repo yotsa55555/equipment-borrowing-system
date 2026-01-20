@@ -1,0 +1,420 @@
+{% extends 'admin1/base.html' %}
+{% load static %}
+
+{% block static %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<style>
+    h1 {
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 30px;
+        margin-top: 2vh;
+        margin-left: 8vw;
+    }
+
+    .container {
+        width: 90%;
+        margin: 20px auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 3vw;
+    }
+
+    .report-section {
+        display: flex;
+        border-radius: 8px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        border: 1px solid #c3c3c3;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .left_content {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        gap: 3vh;
+        align-items: center;
+        width: 60vw;
+        height: 85vh;
+        /* border: 2px solid black; */
+    }
+
+    .container_total {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 3%;
+        align-items: center;
+        /* border: 2px solid black; */
+        width: 100%;
+    }
+
+    .total {
+        background-color: #ffffff;
+        border: 1px solid #c3c3c3;
+        padding-left: 20px;
+        border-radius: 8px;
+        width: 100%;
+        height: 15vh;
+        align-content: center;
+        justify-content: left;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .right_content {
+        display: flex;
+        flex-direction: column;
+        width: 30vw;
+        gap: 2vh;
+        height: 85vh;
+        border-radius: 8px;
+        position: relative;
+        font-family: Arial, sans-serif;
+    }
+
+    .scoreboard {
+        width: 100%;
+        height: 50%;
+        border: 2px solid #333;
+        border-radius: 8px;
+        position: relative;
+        font-family: Arial, sans-serif;
+    }
+
+    .scoreboard h2 {
+        text-align: center;
+        background-color: #333;
+        color: #fff;
+        padding: 10px 0;
+        font-size: 20px;
+    }
+
+    .scroll-board {
+        max-height: 70%; /* Adjust as needed */
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .score-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 8px;
+        font-size: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .score-item:last-child {
+        border-bottom: none;
+    }
+
+    .info {
+        flex: 1;
+        text-align: center;
+        padding-left: 10px;
+        font-weight: bold;
+    }
+
+    .rank {
+        width: 30px;
+        font-weight: bold;
+        color: #444;
+    }
+
+    .name {
+        flex: 1;
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    .score {
+        width: 30%;
+        text-align: right;
+        font-weight: bold;
+        color: #222;
+    }
+
+    /* Optional: Add scrollbar styling */
+    .scroll-board::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .scroll-board::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 35vw;
+        max-width: 50vw;
+        margin: 1em auto;
+    }
+
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+
+    .highcharts-description {
+        margin: 0.3rem 10px;
+    }
+</style>
+{% endblock %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+    <div class="container">
+            <div class="left_content">
+                <div class="container_total">
+                    <div class="total" onclick="pie_total_equipment()">
+                        <span style="color: #4d4d4d; font-size: 16px;">Total equipment</span>
+                        <h2 style="font-weight: bold; margin-bottom: 0px;">{{total_equipment}}</h2>
+                        <span style="color: #4d4d4d; font-size: 14px;">{{total_categories}} categories</span>
+                    </div>
+                    <div class="total">
+                        <span style="color: #4d4d4d; font-size: 16px;">Total loans</span>
+                        <h2 style="font-weight: bold; margin-bottom: 0px;">{{total_borrowing}}</h2>
+                        <span style="color: #4d4d4d; font-size: 14px;">{{total_categories}} categories</span>
+                    </div>
+                    <div class="total">
+                        <span style="color: #4d4d4d; font-size: 16px;">Total equipment</span>
+                        <h2 style="font-weight: bold; margin-bottom: 0px;">{{total_equipment}}</h2>
+                        <span style="color: #4d4d4d; font-size: 14px;">{{total_categories}} categories</span>
+                    </div>
+                    <div class="total">
+                        <span style="color: #4d4d4d; font-size: 16px;">Total equipment</span>
+                        <h2 style="font-weight: bold; margin-bottom: 0px;">{{total_equipment}}</h2>
+                        <span style="color: #4d4d4d; font-size: 14px;">{{total_categories}} categories</span>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <figure class="highcharts-figure">
+                        <div id="container"></div>
+                        <!-- <p class="highcharts-description">
+                            Pie charts demo showing how to create a custom entrance animation.
+                        </p> -->
+                    </figure>
+                </div>
+                    
+            </div>
+
+        <div class="right_content">
+            <div class="scoreboard">
+                <h2 style="font-weight: bold;">History</h2>
+                <div class="score-item" style="padding: 3px 18px;">
+                    <span class="rank" style="color: #8a8a8a;">#</span>
+                    <span class="name" style="color: #8a8a8a;">Device</span>
+                    <span class="name" style="color: #8a8a8a;">Borrower</span>
+                    <span class="score" style="color: #8a8a8a;">Date</span>
+                </div>
+                <div class="scroll-board">
+                    {% for hr in history %}
+                        <div class="score-item">
+                            <span class="rank">{{ forloop.counter }}</span>
+                            <span class="name">{{ hr.equipment.name }}</span>
+                            <span class="name">{{ hr.borrower.fullname }}</span>
+                            <span class="score">{{ hr.borrowed_on|date:"d-m-Y" }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="scoreboard">
+                <h2 style="font-weight: bold;">List of Borrower</h2>
+                <div class="score-item" style="padding: 3px 18px; font-size: 13px;">
+                    <span class="rank" style="font-weight: bold; color: #8a8a8a;">#</span>
+                    <span class="name" style="font-weight: bold; color: #8a8a8a;">Name</span>
+                    <span class="info" style="font-weight: bold; color: #8a8a8a;">Borrowed</span>
+                    <span class="info" style="font-weight: bold; color: #8a8a8a;">Borrowing</span>
+                    <span class="info" style="font-weight: bold; color: #8a8a8a;">Returned</span>
+                    <span class="info" style="font-weight: bold; color: #8a8a8a;">Late</span>
+                </div>
+                <div class="scroll-board">
+                    {% for br in borrower %}
+                        <div class="score-item">
+                            <span class="rank">{{ forloop.counter }}</span>
+                            <span class="name">{{ br.username }}</span>
+                            <span class="info" style="color: blue;">{{ br.borrow_ed }}</span>
+                            <span class="info" style="color: rgb(223, 178, 0);">{{ br.borrow_ing }}</span>
+                            <span class="info" style="color: green;">{{ br.return_ed }}</span>
+                            <span class="info" style="color: red;">{{ br.late_return }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function pie_total_equipment() {
+            const categoryList = JSON.parse('{{ total_eq_by_types|safe }}');
+            const data = []
+            categoryList.forEach(category => {
+                for (const [key, value] of Object.entries(category)) {
+                    data.push({ name: key, y: value });
+                }
+            });
+
+            (function (H) {
+                H.seriesTypes.pie.prototype.animate = function (init) {
+                    const series = this,
+                        chart = series.chart,
+                        points = series.points,
+                        {
+                            animation
+                        } = series.options,
+                        {
+                            startAngleRad
+                        } = series;
+
+                    function fanAnimate(point, startAngleRad) {
+                        const graphic = point.graphic,
+                            args = point.shapeArgs;
+
+                        if (graphic && args) {
+
+                            graphic
+                                // Set inital animation values
+                                .attr({
+                                    start: startAngleRad,
+                                    end: startAngleRad,
+                                    opacity: 1
+                                })
+                                // Animate to the final position
+                                .animate({
+                                    start: args.start,
+                                    end: args.end
+                                }, {
+                                    duration: animation.duration / points.length
+                                }, function () {
+                                    // On complete, start animating the next point
+                                    if (points[point.index + 1]) {
+                                        fanAnimate(points[point.index + 1], args.end);
+                                    }
+                                    // On the last point, fade in the data labels, then
+                                    // apply the inner size
+                                    if (point.index === series.points.length - 1) {
+                                        series.dataLabelsGroup.animate({
+                                            opacity: 1
+                                        },
+                                        void 0,
+                                        function () {
+                                            points.forEach(point => {
+                                                point.opacity = 1;
+                                            });
+                                            series.update({
+                                                enableMouseTracking: true
+                                            }, false);
+                                            chart.update({
+                                                plotOptions: {
+                                                    pie: {
+                                                        innerSize: '40%',
+                                                        borderRadius: 8
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    }
+                                });
+                        }
+                    }
+
+                    if (init) {
+                        // Hide points on init
+                        points.forEach(point => {
+                            point.opacity = 0;
+                        });
+                    } else {
+                        fanAnimate(points[0], startAngleRad);
+                    }
+                };
+            }(Highcharts));
+
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Total equipment',
+                    align: 'left'
+                },
+                subtitle: {
+                    text: ('has <span>{{total_equipment}}</span> pieces in <span>{{total_categories}}</span> categories.'),
+                    align: 'left'
+                },
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat:
+                        '<span style="color:{point.color}">\u25cf</span> ' +
+                        '{point.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        borderWidth: 2,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b><br>{point.percentage}%',
+                            distance: 20
+                        }
+                    }
+                },
+                series: [{
+                    // Disable mouse tracking on load, enable after custom animation
+                    enableMouseTracking: false,
+                    animation: {
+                        duration: 1000
+                    },
+                    colorByPoint: true,
+                    data: data
+                }]
+            });
+        }
+    </script>
+{% endblock %}

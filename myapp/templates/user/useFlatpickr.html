@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">  <!-- import อันนี้ -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>                                <!-- import อันนี้ -->
+    <title>Use flatpickr</title>
+</head>
+<body>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="borrow-date">Borrowing date</label>
+        <input type="date" name="borrow-date" id="borrow-date" placeholder="Choose a borrow date here." required>
+
+        <label for="return-date">Return date</label>
+        <input type="date" name="return-date" id="return-date" placeholder="Choose a return date here." required>
+    
+        <button type="submit" class="btn save">Send</button>
+    </form>
+
+    <script>
+        // const reservedRanges = {{ reserved_ranges|safe }};   reserved_ranges ดึงข้อมูลวันที่มาจาก database ใน views.py
+
+        const reservedRanges = [
+            {'date_borrow': '2024-10-20', 'date_return': '2024-10-23'}, 
+            {'date_borrow': '2024-10-25', 'date_return': '2024-10-26'}
+        ]; // อันนี้สมมติว่าเป็นข้อมูลที่ดึงมาแล้ว
+        
+        const borrowDateInput = document.getElementById("borrow-date");
+        const returnDateInput = document.getElementById("return-date");
+
+        const today = new Date().toISOString().split('T')[0];
+        
+        // min date for input date is today
+        borrowDateInput.setAttribute("min", today);
+        returnDateInput.setAttribute("min", today);
+
+        const isDateInReservedRange = (date) => {
+            const normalizedDate = new Date(date.setHours(0, 0, 0, 0));
+
+            return reservedRanges.some(range => {
+                const startDate = new Date(range.date_borrow);
+                const endDate = new Date(range.date_return);
+
+                const normalizedStartDate = new Date(startDate.setHours(0, 0, 0, 0));
+                const normalizedEndDate = new Date(endDate.setHours(23, 59, 59, 999));
+
+                return normalizedDate >= normalizedStartDate && normalizedDate <= normalizedEndDate;
+            });
+        };
+
+        // สำหรับ input ที่ id='borrow-date'
+        flatpickr("#borrow-date", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: [
+                function(date) {
+                    return isDateInReservedRange(date);
+                }
+            ],
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const date = new Date(dayElem.dateObj);
+                if (isDateInReservedRange(date)) {
+                    dayElem.style.backgroundColor = "#ffcccc"; 
+                    dayElem.style.color = "#ff0000"; 
+                }
+            }
+        });
+
+        // สำหรับ input ที่ id='return-date'
+        flatpickr("#return-date", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: [
+                function(date) {
+                    return isDateInReservedRange(date);
+                }
+            ],
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const date = new Date(dayElem.dateObj);
+                if (isDateInReservedRange(date)) {
+                    dayElem.style.backgroundColor = "#ffcccc"; 
+                    dayElem.style.color = "#ff0000";      
+                }
+            }
+        });
+
+        borrowDateInput.addEventListener("change", function() {
+            const borrowDate = new Date(this.value);
+
+            if (returnDateInput.value) {
+                const returnDate = new Date(returnDateInput.value);
+                if (returnDate <= borrowDate) {
+                    alert("Return date must be after the borrow date.");
+                    returnDateInput.value = ""; 
+                }
+            }
+
+            returnDateInput.setAttribute("min", this.value);
+        });
+
+        returnDateInput.addEventListener("change", function() {
+            const returnDate = new Date(this.value);
+            const borrowDate = new Date(borrowDateInput.value);
+
+            if (returnDate <= borrowDate) {
+                alert("Return date must be after the borrow date.");
+                this.value = ""; // Reset the return date
+            }
+        });
+    </script>
+</body>
+</html>
+
+<!-- example ดึงข้อมูลจาก model ใน views.py
+def borrow_view(request, equipment_id):
+    equipment = Equipment.objects.get(equipment_id=equipment_id)
+    during = DuringBorrowing.objects.filter(equipment=equipment)
+    reserved_ranges = [{
+        'date_borrow': dr.borrowed_on.strftime('%Y-%m-%d'),
+        'date_return': dr.returned_on.strftime('%Y-%m-%d')
+    } for dr in during ]
+
+    return render(request, 'user/borrow_user.html', {'reserved_ranges': reserved_ranges}) -->

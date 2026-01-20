@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalog for Borrowing</title>
+  <link rel="stylesheet" href="{% static 'maincatalogCss.css' %}">
+</head>
+<body>
+  <div class="catalog-container">
+    <h1>Catalog for Borrowing</h1>
+    <div class="search-bar">
+      <div class="search-container">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search...">
+      </div>
+      <label for="statusSelect">Status:</label>
+      <select id="statusSelect">
+        <option value="showall">Show all</option>
+        <option value="available">Available</option>
+        <option value="unavailable">Unavailable</option>
+      </select>
+    </div>
+
+    <!-- Table for Show All -->
+    <table id="tableShowAll" class="catalog-table">
+      <thead>
+        <tr>
+          <th>Equipment Name</th>
+          <th>Parcel ID</th>
+          <th>Status</th>
+          <th>Date borrow-return</th>
+          <th>Brand</th>
+          <th>Picture</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>VR Oculus Quest 2</td>
+          <td>VRoq863113635</td>
+          <td class="status-unavailable">Unavailable</td>
+          <td>Bowrow - 04/09/2024<br>Return - 12/09/2024</td>
+          <td>Oculus</td>
+          <td><button class="view-btn"><img src="https://mediam.dotlife.store/media/catalog/product/cache/3b7e899159f673788675d87d1d929a98/o/c/oculus_quest_2_cpw_.001.jpeg" style="width: 50px; height: 50px;" /></button></td>
+        </tr>
+        <tr>
+          <td>VR Oculus Quest 2</td>
+          <td>VReqB88131785</td>
+          <td class="status-available">Available</td>
+          <td> - </td>
+          <td>Oculus</td>
+          <td><button class="view-btn"><img src="https://mediam.dotlife.store/media/catalog/product/cache/3b7e899159f673788675d87d1d929a98/o/c/oculus_quest_2_cpw_.001.jpeg" style="width: 50px; height: 50px;" /></button></td>
+        </tr>
+        <tr>
+          <td>XP-Pen Deco Mini 4</td>
+          <td>XP518415452-9</td>
+          <td class="status-available">Available</td>
+          <td> - </td>
+          <td>XP-Pen</td>
+          <td><button class="view-btn"><img src="https://m.thaiware.com/upload_misc/shop/2021_08/thumbnails/5335_2108271226416S.jpg" style="width: 50px; height: 50px;" /></button></td>
+        </tr>
+        <tr>
+            <td>VR Oculus Quest 2</td>
+            <td>VRoq85691</td>
+            <td class="status-unavailable">Unavailable</td>
+            <td>Bowrow - 04/09/2024<br>Return - 12/09/2024</td>
+            <td>Oculus</td>
+            <td><button class="view-btn"><img src="https://mediam.dotlife.store/media/catalog/product/cache/3b7e899159f673788675d87d1d929a98/o/c/oculus_quest_2_cpw_.001.jpeg" style="width: 50px; height: 50px;" /></button></td>
+        </tr>
+        <tr>
+            <td> XP-Pen Deco Mini 4</td>
+            <td>XP5184154</td>
+            <td><span class="status-unavailable">Unavailable</span></td>
+            <td>Bowrow - 06/09/2024<br>Return - 20/09/2024</td>
+            <td>XP-Pen</td>
+          <td><button class="view-btn"><img src="https://m.thaiware.com/upload_misc/shop/2021_08/thumbnails/5335_2108271226416S.jpg" style="width: 50px; height: 50px;" /></button></td>
+        </tr>
+        <tr>
+            <td>VR Oculus Quest 2</td>
+            <td>VReqB96391357</td>
+            <td class="status-available">Available</td>
+            <td> - </td>
+            <td>Oculus</td>
+            <td><button class="view-btn"><img src="https://mediam.dotlife.store/media/catalog/product/cache/3b7e899159f673788675d87d1d929a98/o/c/oculus_quest_2_cpw_.001.jpeg" style="width: 50px; height: 50px;" /></button></td>
+          </tr>
+
+      </tbody>
+    </table>
+
+    <!-- Table for Available -->
+    <table id="tableRegular" class="catalog-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Equipment Name</th>
+          <th>Parcel ID</th>
+          <th>Status</th>
+          <th>Brand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td> VR Oculus Quest 2</td>
+          <td>VRoq85691</td>
+          <td><span class="status available">Available</span></td>
+          <td> Oculus</td>
+        </tr>
+        <tr>
+          <td> VR Oculus Quest 2</td>
+          <td>VRoq863113635</td>
+          <td><span class="status available">Available</span></td>
+          <td> Oculus</td>
+        </tr>
+        <tr>
+          <td> XP-Pen Deco Mini 4</td>
+          <td>XP5184154</td>
+          <td><span class="status available">Available</span></td>
+          <td> XP-Pen</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Table for Unavailable -->
+    <table id="tableDamaged" class="catalog-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Equipment Name</th>
+          <th>Parcel ID</th>
+          <th>Status</th>
+          <th>Brand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td> VR Oculus Quest 2</td>
+          <td>VRoq85691</td>
+          <td><span class="status unavailable">Unavailable</span></td>
+          <td> Oculus</td>
+        </tr>
+        <tr>
+          <td> VR Oculus Quest 2</td>
+          <td>VRoq86311</td>
+          <td><span class="status unavailable">Unavailable</span></td>
+          <td> Oculus</td>
+        </tr>
+        <tr>
+          <td> XP-Pen Deco Mini 4</td>
+          <td>XP5184154</td>
+          <td><span class="status unavailable">Unavailable</span></td>
+          <td> XP-Pen</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <script src="maincatalogjava.js"></script>
+</body>
+</html>

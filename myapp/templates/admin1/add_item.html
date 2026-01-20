@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add item</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .container {
+            position: relative;
+            background: white;
+            padding: 20px 55px 40px 35px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            width: 30vw;
+            border-radius: 10px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input{
+            width: 100%;
+            padding: 9px;
+            margin-bottom: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form action="{% url 'catalog_admin' %}" method="get">
+            <button class="close-btn" type="submit">&times;</button>
+        </form>
+        <h1>Add Equipment</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column;">
+                    <label for="deviceName">Equipment's Name</label>
+                    <input type="text" id="deviceName" name="deviceName" required>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label for="parcelName">Serial Number</label>
+                    <input type="text" id="parcelName" name="parcelName" required>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column;">
+                    <label for="brand">Brand</label>
+                    <input type="text" id="brand" name="brand" required>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label for="categories">Category</label>
+                    <input type="text" id="categories" name="category" required>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column;">
+                    <label for="describtion">Describtion</label>
+                    <input type="text" id="describtion" name="describtion" required>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label for="status">Status</label>
+                    <input type="text" value="Available" name="status" required disabled>
+                </div>
+            </div>
+        
+            <label for="uploadPhoto">Upload Photo</label>
+            <input type="file" id="uploadPhoto" name="uploadPhoto" accept="image/*" required>
+        
+            <button type="submit" class="btn save">Add</button>
+        </form>
+    </div>
+</body>
+
+</html>

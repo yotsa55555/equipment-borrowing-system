@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrowing Status</title>
+    <link rel="stylesheet" href="{% static 'borrowing status.css' %}">
+
+</head>
+<body>
+    <div class="container">
+
+        <nav>
+            <ul>
+                <li><a href="{% url 'home_staff' %}">HOME</a></li>
+                <li><a href="{% url 'catalog_staff' %}">CATALOG</a></li>
+                <li><a href="{% url 'approval_staff' %}">APPROVAL</a></li>
+                <li><a href="{% url 'history_staff' %}">HISTORY</a></li>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" id="logout-btn" class="logout-btn">Logout</button>
+                </form>
+        
+            </ul>
+        </nav>
+
+        <h1>History</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Waiting Check</th>
+                    <th>Borrower's Name</th>
+                    <th>Date Borrow</th>
+                    <th>Date Return</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Example row -->
+                <tr>
+                    <td>Item A</td>
+                    <td>10</td>
+                    <td>Pending</td>
+                    <td>Jane Smith</td>
+                    <td>2024-08-30</td>
+                    <td>2024-09-05</td>
+                </tr>
+
+                <tr>
+                    <td>Item B</td>
+                    <td>10</td>
+                    <td>Pending</td>
+                    <td>Jane Smith</td>
+                    <td>2024-08-30</td>
+                    <td>2024-09-05</td>
+                </tr>
+
+                <tr>
+                    <td>Item C</td>
+                    <td>10</td>
+                    <td>Pending</td>
+                    <td>Jane Smith</td>
+                    <td>2024-08-30</td>
+                    <td>2024-09-05</td>
+                </tr>
+
+                <tr>
+                    <td>Item D</td>
+                    <td>10</td>
+                    <td>Pending</td>
+                    <td>Jane Smith</td>
+                    <td>2024-08-30</td>
+                    <td>2024-09-05</td>
+                </tr>
+
+                <tr>
+                    <td>Item E</td>
+                    <td>10</td>
+                    <td>Pending</td>
+                    <td>Jane Smith</td>
+                    <td>2024-08-30</td>
+                    <td>2024-09-05</td>
+                </tr>
+                <!-- Additional rows go here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

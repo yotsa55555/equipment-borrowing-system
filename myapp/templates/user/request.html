@@ -1,0 +1,158 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block static %}
+<style>
+    h1 {
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: white;
+        border: 2px solid #000;
+        margin-top: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    thead {
+        background-color: #000;
+        color: white;
+    }
+    
+    th, td {
+        padding: 10px 10px;
+        text-align: center;
+        border: 1px solid #000; 
+    }
+
+    .container {
+        width: 90%;
+        margin: 20px auto;
+        
+    }
+
+    h2{
+        font-weight: bold;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px 50px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        text-align: left;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+{% block title %}Request{% endblock %}
+
+{% block content %} 
+    <div class="container">
+        <h1>Request</h1>
+
+        <div style="padding: 0px 15px; margin-top: 15px;">
+            <span style="color: #757575;">You can click on the name of the equipment to get more info.</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Equipment</th>
+                    <th scope="col">Parcel ID</th>
+                    <th scope="col">Date Borrow</th>
+                    <th scope="col">Date Return</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not during and not borrow %}
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No data</td>
+                    </tr>
+                {% else %}
+                    {% for dr in borrow %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <span onclick="openModal('equipmentModal_{{ dr.equipment.equipment_id }}')" style="cursor: pointer;">{{ dr.equipment.name }}</span>
+                                <div id="equipmentModal_{{ dr.equipment.equipment_id }}" class="modal">
+                                    <div class="modal-content">
+                                        <span class="modal-close" onclick="closeModal('equipmentModal_{{ dr.equipment.equipment_id }}')">&times;</span>
+                                        <h2>{{ dr.equipment.name }}</h2>
+                                        <div>
+                                            <img src="{{ dr.equipment.image.url }}" alt="{{ dr.equipment.name }}" style="height: 150px; width: 150px;">
+                                            <span style="font-weight: bold;">Serial Number : </span>{{ dr.equipment.parcel_id }}
+                                            <br><span style="font-weight: bold;">Brand : </span>{{ dr.equipment.brand }}
+                                            <br><span style="font-weight: bold;">Category : </span>{{ dr.equipment.categories }}
+                                            <br><span style="font-weight: bold;">Describtion : </span>{{ dr.equipment.describtion }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ dr.equipment.parcel_id }}</td>
+                            <td>{{ dr.borrowed_on|date:"d-m-Y" }}</td>
+                            <td>{{ dr.returned_on|date:"d-m-Y" }}</td>
+                            <td>
+                                {% if dr.equipment.status and dr.equipment.borrower == dr.borrower %}
+                                    <span style="color: #0084ff;">Approved</span>
+                                {% else %}
+                                    <span style="color: #757575;">Waiting for approval</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName("modal");
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                }
+            }
+        };
+    </script>
+{% endblock %}

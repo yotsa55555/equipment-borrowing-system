@@ -1,0 +1,179 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+
+{% block static %}
+<style>
+    h1 {
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: white;
+        border: 2px solid #000;
+        margin-top: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    thead {
+        background-color: #000;
+        color: white;
+    }
+    
+    th, td {
+        padding: 10px 10px;
+        text-align: center;
+        border: 1px solid #000; 
+    }
+
+    .container {
+        width: 90%;
+        margin: 20px auto;
+        
+    }
+
+    h2{
+        font-weight: bold;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px 50px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        text-align: left;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+{% block title %}Request{% endblock %}
+
+{% block content %} 
+    <div class="container">
+        <h1>Approval</h1>
+
+        <div style="padding: 0px 15px; margin-top: 15px;">
+            <span style="color: #757575;">You can click on the name of the equipment or borrower to get more info.</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Equipment</th>
+                    <th scope="col">Parcel ID</th>
+                    <th scope="col">Borrower</th>
+                    <th scope="col">Tel.</th>
+                    <th scope="col">Date Borrow</th>
+                    <th scope="col">Date Return</th>
+                    <th scope="col">Approval</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not all_borrow %}
+                    <tr>
+                        <td colspan="8" style="text-align: center;">No data</td>
+                    </tr>
+                {% else %}
+                    {% for borrow in all_borrow %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <span onclick="openModal('equipmentModal_{{ borrow.equipment.equipment_id }}')" style="cursor: pointer;">{{ borrow.equipment.name }}</span>
+                                <div id="equipmentModal_{{ borrow.equipment.equipment_id }}" class="modal">
+                                    <div class="modal-content">
+                                        <span class="modal-close" onclick="closeModal('equipmentModal_{{ borrow.equipment.equipment_id }}')">&times;</span>
+                                        <h2>{{ borrow.equipment.name }}</h2>
+                                        <div>
+                                            <span style="font-weight: bold;">Serial Number : </span>{{ borrow.equipment.parcel_id }}
+                                            <br><span style="font-weight: bold;">Brand : </span>{{ borrow.equipment.brand }}
+                                            <br><span style="font-weight: bold;">Category : </span>{{ borrow.equipment.categories }}
+                                            <br><span style="font-weight: bold;">Describtion : </span>{{ borrow.equipment.describtion }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ borrow.equipment.parcel_id }}</td>
+                            <td>
+                                <span onclick="openModal('borrowerModal_{{ borrow.borrower.student_id }}')" style="cursor: pointer;">{{ borrow.borrower.fullname }}</span>
+                                <div id="borrowerModal_{{ borrow.borrower.student_id }}" class="modal">
+                                    <div class="modal-content">
+                                        <span class="modal-close" onclick="closeModal('borrowerModal_{{ borrow.borrower.student_id }}')">&times;</span>
+                                        <h2>{{ borrow.borrower.fullname }}</h2>
+                                        <div>
+                                            <span style="font-weight: bold;">Student ID : </span>{{ borrow.borrower.student_id_edu|slice:":9" }}-{{ borrow.borrower.student_id_edu|slice:"-1:" }}
+                                            <br><span style="font-weight: bold;">Major : </span>{{ borrow.borrower.major }}
+                                            <br><span style="font-weight: bold;">kkumail : </span>{{ borrow.borrower.kkumail }}
+                                            <br><span style="font-weight: bold;">Telephone : </span>{{ borrow.borrower.phone|slice:":3" }} {{ borrow.borrower.phone|slice:"3:6" }} {{ borrow.borrower.phone|slice:"6:" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ borrow.borrower.phone }}</td>
+                            <td>{{ borrow.borrowed_on|date:"d-m-Y" }}</td>
+                            <td>{{ borrow.returned_on|date:"d-m-Y" }}</td>
+                            <td>
+                                <form action="{% url 'borrow_pass' borrow.id %}" method="post">
+                                    {% csrf_token %}
+                                    {% if borrow.equipment.status %}
+                                        <button class="btn btn-secondary" disabled>Waiting for return</button>
+                                    {% else %}
+                                        <button class="btn btn-success" type="submit" name="action" value="agree">Approve</button>
+                                        <button class="btn btn-danger" type="submit" name="action" value="disagree">Not approved</button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName("modal");
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                }
+            }
+        };
+    </script>
+{% endblock %}

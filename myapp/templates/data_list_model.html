@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data List Contact</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 30px auto 30px;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        table {
+            width: 60%;
+            margin: 0 auto 30px;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden; /* Ensures the border-radius is applied to the whole table */
+        }
+        .section-header {
+            font-weight: bold;
+            background-color: #fff;
+            text-align: center;
+            padding-left: 10px;
+            color: #333;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #e74c3c;
+            color: white;
+        }
+        td {
+            background-color: #f1f1f1;
+        }
+        .edit-btn {
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .add-new {
+            width: 55%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .add-new input {
+            width: 30%;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .add-new button {
+            width: 30%;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-new button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>All Data Records</h1>
+    </header>
+
+    <!-- Data list table -->
+    <table>
+        <thead>
+            <tr>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Contact</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Your records section -->
+            <tr>
+                <td class="section-header" colspan="4">Your records</td>
+            </tr>
+            <tr>
+                <td>xxxxx</td>
+                <td>xxxxx</td>
+                <td>064684xxxx</td>
+                <td><button class="edit-btn">Edit</button></td>
+            </tr>
+
+            <!-- All records section -->
+            <tr>
+                <td class="section-header" colspan="4">All records</td>
+            </tr>
+            <tr>
+                <td>xxxxx</td>
+                <td>xxxxx</td>
+                <td>064684xxxx</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>xxxx</td>
+                <td>xxxxx</td>
+                <td>064684xxxx</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Add new record form -->
+    <div class="add-new">
+        <h2>Add new record</h2>
+        <form>
+            <input type="text" placeholder="First name..." required>
+            <br>
+            <input type="text" placeholder="Last name..." required>
+            <br>
+            <input type="text" placeholder="Phone number..." required>
+            <br>
+            <button type="submit">Add</button>
+        </form>
+    </div>
+    <div>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" id="logout-btn" class="logout-btn">Logout</button>
+        </form>
+
+    </div>
+
+</body>
+</html>

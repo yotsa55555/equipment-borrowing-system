@@ -1,0 +1,370 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+
+{% block static %}
+<style>
+    h1 {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    .container {
+        width: 90%;
+        margin: 20px auto;
+    }
+
+    section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 30px;
+        background-color: #ffffff;
+        height: 11vh; 
+        width: 100%;
+    }
+
+    section div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #search-bar {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .status-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #request-button {
+        padding: 8px 12px;
+        background-color: #a50101;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #lend-button {
+        padding: 8px 12px;
+        background-color: #eb9d00;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #disabled-button {
+        padding: 8px 12px;
+        background-color: #bdbcbc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    #request-button:hover {
+        background-color: #45a049;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: white;
+        border: 2px solid #000;
+        margin-top: 8px;
+    }
+
+    thead {
+        background-color: #000;
+        color: white;
+    }
+    
+    th, td {
+        padding: 15px 10px;
+        text-align: center;
+        border: 1px solid #000; 
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    img {
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    .status.available {
+        color: green;
+        font-weight: bold;
+    }
+
+    .status.unavailable {
+        color: red;
+        font-weight: bold;
+    }
+
+    h2{
+        font-weight: bold;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px 50px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        text-align: left;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+
+    form {
+        display: flex; 
+        flex-direction: row; 
+        justify-content: center; 
+        align-items: center;
+        margin-right: 15px;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+{% block title %}Catalog for Borrowing{% endblock %}
+
+{% block content %} 
+    <div class="container">
+        <h1>Catalog for Lab Staff</h1>
+        <section>
+            <div>
+                <form action="" method="get">
+                    <input class="form-control" type="text" placeholder="Search..." name="q" value="{{ request.GET.q|default_if_none:'' }}"
+                        onkeydown="if(event.key === 'Enter'){ this.form.submit(); }">
+                    <button type="submit" class="btn btn-dark">Search</button>
+                </form>
+
+                <form method="post" action="{% url 'catalog_staff' %}">
+                    {% csrf_token %}
+                
+                    <!-- Status Dropdown -->
+                    <label for="status_filter">Status:</label>
+                    <select name="filter" class="form-select" id="status_filter">
+                        <option value="">--------</option>
+                        <option value="Available" {% if selected_status == "Available" %}selected{% endif %}>Available</option>
+                        <option value="Unavailable" {% if selected_status == "Unavailable" %}selected{% endif %}>Unavailable</option>
+                    </select>
+                
+                    <!-- Category Dropdown -->
+                    <label for="category_filter">Category:</label>
+                    <select name="categories" class="form-select" id="category_filter" style="margin-right: 15px;">
+                        <option value="">--------</option>
+                        {% for category in categories %}
+                            <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>
+                                {{ category }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                
+                    <button type="submit" class="btn btn-dark">Apply</button>
+                </form>
+            </div>
+        </section>
+        <div style="padding: 0px 15px; margin-top: 0px; color: #757575;">
+            <span>You can click on the name of the device or borrower to get more info.</span>
+        </div>
+
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Picture</th>
+                    <th scope="col">Equipment</th>
+                    <th scope="col">Serial Number</th>
+                    <th scope="col">Borrow Date</th>
+                    <th scope="col">Return Date</th>
+                    <th scope="col">Borrower</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not all_equipment %}
+                    <tr>
+                        <td colspan="9" style="text-align: center;">No data</td>
+                    </tr>
+                {% endif %}
+                {% for equipment in all_equipment %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td><img src="{{ equipment.image.url }}" alt="{{ equipment.name }}"></td>
+                        <td>
+                            <span onclick="openModal('equipmentModal_{{ equipment.equipment_id }}')" style="cursor: pointer;">{{ equipment.name }}</span>
+                            <div id="equipmentModal_{{ equipment.equipment_id }}" class="modal">
+                                <div class="modal-content">
+                                    <span class="modal-close" onclick="closeModal('equipmentModal_{{ equipment.equipment_id }}')">&times;</span>
+                                    <h2>{{ equipment.name }}</h2>
+                                    <div>
+                                        <span style="font-weight: bold;">Serial Number : </span>{{ equipment.parcel_id }}
+                                        <br><span style="font-weight: bold;">Brand : </span>{{ equipment.brand }}
+                                        <br><span style="font-weight: bold;">Category : </span>{{ equipment.categories }}
+                                        <br><span style="font-weight: bold;">Describtion : </span>{{ equipment.describtion }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ equipment.parcel_id }}</td>
+                        <td>
+                            {{ equipment.date_borrow|date:"d-m-Y" }}
+                            {% if not equipment.date_borrow %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ equipment.date_return|date:"d-m-Y" }}
+                            {% if not equipment.date_return %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not equipment.borrower %}
+                            -
+                            {% else %}
+                                <span onclick="openModal('borrowerModal_{{ equipment.borrower.student_id }}')" style="cursor: pointer;">{{ equipment.borrower.fullname }}</span>
+                                <div id="borrowerModal_{{ equipment.borrower.student_id }}" class="modal">
+                                    <div class="modal-content">
+                                        <span class="modal-close" onclick="closeModal('borrowerModal_{{ equipment.borrower.student_id }}')">&times;</span>
+                                        <h2>{{ equipment.borrower.fullname }}</h2>
+                                        <div>
+                                            <span style="font-weight: bold;">Student ID : </span>{{ equipment.borrower.student_id_edu|slice:":9" }}-{{ equipment.borrower.student_id_edu|slice:"-1:" }}
+                                            <br><span style="font-weight: bold;">Major : </span>{{ equipment.borrower.major }}
+                                            <br><span style="font-weight: bold;">kkumail : </span>{{ equipment.borrower.kkumail }}
+                                            <br><span style="font-weight: bold;">Telephone : </span>{{ equipment.borrower.phone|slice:":3" }} {{ equipment.borrower.phone|slice:"3:6" }} {{ equipment.borrower.phone|slice:"6:" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if equipment.status %}
+                                <span class="status unavailable">Unavailable</span>
+                                {% else %}
+                                <span class="status available">Available</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{% url 'return_item' equipment.equipment_id %}" method="post">
+                                {% csrf_token %}
+                                {% if equipment.status %}
+                                    <button id="request-button" type="submit" value="return" name="action">Return</button>
+                                {% else %}
+                                    <button id="disabled-button" type="submit" disabled>Return</button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <script>
+                function navigateToBorrow(equiment_id) {
+                    window.location.href = '/user_borrowing/' + equiment_id ;
+                }
+            </script>
+        </table>
+        <div style="margin: 20px 20px; margin-bottom: 60px;">
+            <button onclick="previousPage()" class="btn btn-secondary btn-sm">Previous</button>
+            <span style="border: 2px solid #585858; padding: 5px; border-radius: 5px;">Page <span id="page-number">1</span></span>
+            <button onclick="nextPage()" class="btn btn-secondary btn-sm">Next</button>
+        </div>
+    </div>
+    <script>
+        let currentPage = 1;
+        const rowsPerPage = 5;
+
+        function showPage(page) {
+            const table = document.getElementById("myTable").getElementsByTagName("tbody")[0];
+            const rows = table.getElementsByTagName("tr");
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            document.getElementById("page-number").innerText = page;
+
+            // Hide all rows
+            for (let i = 0; i < totalRows; i++) {
+                rows[i].style.display = "none";
+            }
+
+            // Show only rows for the current page
+            for (let i = (page - 1) * rowsPerPage; i < page * rowsPerPage && i < totalRows; i++) {
+                rows[i].style.display = "";
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        function nextPage() {
+            currentPage++;
+            showPage(currentPage);
+        }
+
+        window.onload = function() {
+            showPage(1);
+        };
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName("modal");
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                }
+            }
+        };
+    </script>
+{% endblock %}

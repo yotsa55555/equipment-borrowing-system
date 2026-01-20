@@ -1,0 +1,178 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+
+{% block static %}
+<style>
+    h1 {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .container {
+        width: 90%;
+        margin: 20px auto;
+    }
+    
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+        background-color: white;
+        border: 2px solid #000;
+        margin-top: 15px;
+    }
+
+    thead {
+        background-color: #000;
+        color: white;
+    }
+    
+    th, td {
+        padding: 10px 10px;
+        text-align: center;
+        border: 1px solid #000; 
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    h2 {
+        font-weight: bold;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px 50px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+        text-align: left;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+
+    section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 40px;
+        background-color: #ffffff;
+        height: 11vh; 
+        width: 100%;
+    }
+
+    section div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+{% block title %}Equipment Borrowing System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>History of Borrower</h1>
+    <section>
+        <div class="header-left">
+            <form action="" method="get">
+                <span>Search</span>
+                <input type="text" placeholder="Search by borrower..." class="form-control" name="q"
+                    value="{{ request.GET.q|default_if_none:'' }}" onkeydown="if(event.key === 'Enter'){ this.form.submit(); }">
+            </form>
+        </div>
+        <div style="align-self: self-end; color: #757575;">
+            <span>You can click on the name of the borrower to get more info.</span>
+        </div>
+    </section>
+
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Student ID</th>
+                <th scope="col">Tel.</th>
+                <th scope="col">Borrowed (times)</th>
+                <th scope="col">Borrowing (times)</th>
+                <th scope="col">Returned (times)</th>
+                <th scope="col">Late return (times)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if not all_student %}
+                <tr>
+                    <td colspan="8" style="text-align: center;">No data</td>
+                </tr>
+            {% else %}
+                {% for student in all_student %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <span onclick="openModal('borrowerModal_{{ student.student_id }}')" style="cursor: pointer;">{{ student.fullname }}</span>
+                        <div id="borrowerModal_{{ student.student_id }}" class="modal">
+                            <div class="modal-content">
+                                <span class="modal-close" onclick="closeModal('borrowerModal_{{ student.student_id }}')">&times;</span>
+                                <h2>{{ student.fullname }}</h2>
+                                <div>
+                                    <span style="font-weight: bold;">Student ID : </span>{{ student.student_id_edu|slice:":9" }}-{{ student.student_id_edu|slice:"-1:" }}
+                                    <br><span style="font-weight: bold;">Major : </span>{{ student.major }}
+                                    <br><span style="font-weight: bold;">kkumail : </span>{{ student.kkumail }}
+                                    <br><span style="font-weight: bold;">Telephone : </span>{{ student.phone|slice:":3" }} {{ student.phone|slice:"3:6" }} {{ student.phone|slice:"6:" }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ student.student_id_edu|slice:":9" }}-{{ student.student_id_edu|slice:"-1:" }}</td>
+                    <td>{{ student.phone }}</td>
+                    <td>{{ student.borrow_ed }}</td>
+                    <td>{{ student.borrow_ing }}</td>
+                    <td>{{ student.return_ed }}</td>
+                    <td>{{ student.late_return }}</td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+<script>
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modals = document.getElementsByClassName("modal");
+        for (let i = 0; i < modals.length; i++) {
+            if (event.target == modals[i]) {
+                modals[i].style.display = 'none';
+            }
+        }
+    };
+</script>
+{% endblock %}

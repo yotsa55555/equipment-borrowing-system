@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="{% static 'registorCss.css' %}">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="container">
+    <div class="title">Registration</div>
+    <div class="content">
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Full Name</span>
+            <input type="text" name="fullname" placeholder="Enter your name" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Username</span>
+            <input type="text" name="username" placeholder="Enter your username" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Kkumail</span>
+            <input type="text" name="kkumail" placeholder="Enter your Kkumail" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Phone Number</span>
+            <input type="text" name="phone" placeholder="Enter your number" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Password</span>
+            <input type="text" name="password" placeholder="Enter your password" required>
+          </div>
+          <div class="input-box">
+            <span class="details">Student ID</span>
+            <input type="text" name="student_id_edu" placeholder="Student ID" required>
+          </div>
+        </div>
+        <div class="Major-details" aria-required="true">
+          <input type="radio" name="Major" value="DME" id="dot-1" required>
+          <input type="radio" name="Major" value="CoE" id="dot-2">
+          <input type="radio" name="Major" value="Other" id="dot-3">
+          <span class="Major-title">Major</span>
+          <div class="category">
+            <label for="dot-1">
+              <span class="dot one"></span>
+              <span class="Major">DME</span>
+            </label>
+            <label for="dot-2">
+              <span class="dot two"></span>
+              <span class="Major">COE</span>
+            </label>
+            <label for="dot-3">
+              <span class="dot three"></span>
+              <span class="Major">Other</span>
+            </label>
+          </div>
+        </div>
+        {% if messages %}
+          {% for message in messages %}
+            <div style="color: red;" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+        <div class="button">
+          <input type="submit" value="Register">
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

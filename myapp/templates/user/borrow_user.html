@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <title>Add item</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            margin: 0;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .container {
+            position: relative;
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 25vw;
+            border-radius: 10px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input{
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form action="{% url 'catalog_user' %}" method="get">
+            <button class="close-btn" type="submit">&times;</button>
+        </form>
+        <h1>Borrowing</h1>
+        <form method="POST" enctype="multipart/form-data" id="borrow-form">
+            {% csrf_token %}
+            {%  if user.is_authenticated %}
+                <label for="Name">Your name</label>
+                <input type="text" name="deviceName" value="{{ user.fullname }}" disabled>
+            {% endif %}
+            
+            <label for="id_name" class="form-label">Device name</label>
+            <input type="text" value="{{ equipment.name }}" disabled></input>
+
+            <label for="id_parcel_id" class="form-label">Serial number</label>
+            <input type="text" value="{{ equipment.parcel_id }}" disabled></input>
+        
+            <label for="date_borrow">Borrowing date</label>
+            <input type="date" name="date_borrow" id="borrow-date" placeholder="วว/ดด/ปปปป" style="font-size: 14px;" required>
+
+            <label for="date_return">Return date</label>
+            <input type="date" name="date_return" id="return-date" placeholder="Return date..." style="color: #656565;" readonly required>
+        
+            <button type="submit" class="btn save">Send</button>
+        </form>
+    </div>
+    <script>
+        const reservedRanges = {{ reserved_ranges|safe }};
+        
+        const borrowDateInput = document.getElementById("borrow-date");
+        const returnDateInput = document.getElementById("return-date");
+    
+        const today = new Date().toISOString().split('T')[0];
+        
+        borrowDateInput.setAttribute("min", today);
+    
+        const isDateInReservedRange = (date) => {
+            const normalizedDate = new Date(date.setHours(0, 0, 0, 0));
+    
+            return reservedRanges.some(range => {
+                const startDate = new Date(range.date_borrow);
+                const endDate = new Date(range.date_return);
+    
+                const normalizedStartDate = new Date(startDate.setHours(0, 0, 0, 0));
+                const normalizedEndDate = new Date(endDate.setHours(23, 59, 59, 999));
+    
+                return normalizedDate >= normalizedStartDate && normalizedDate <= normalizedEndDate;
+            });
+        };
+    
+        flatpickr("#borrow-date", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: [
+                function(date) {
+                    return isDateInReservedRange(date);
+                }
+            ],
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const date = new Date(dayElem.dateObj);
+                if (isDateInReservedRange(date)) {
+                    dayElem.style.backgroundColor = "#ffcccc"; 
+                    dayElem.style.color = "#ff0000"; 
+                }
+            }
+        });
+    
+        borrowDateInput.addEventListener("change", function() {
+            const borrowDate = new Date(this.value);
+            const returnDate = new Date(borrowDate);
+            returnDate.setDate(returnDate.getDate() + 2);
+            returnDateInput.value = returnDate.toISOString().split('T')[0];
+        });
+
+        document.getElementById("borrow-form").addEventListener("submit", function(event) {
+            if (!borrowDateInput.value) {
+                alert("Please select a borrow date.");
+                event.preventDefault();
+                return;
+            }
+        });
+    </script>
+    
+</body>
+</html>
