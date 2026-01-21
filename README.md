@@ -4,7 +4,7 @@ managing equipment inventory and track borrowing/returning statuses. The system 
 🌐 Live Demo & Preview
 Live Link: http://52.221.109.70 
 Project Status: Production
-[![Watch the Demo]](https://https://www.youtube.com/watch?v=lxVxRVy9sRs)
+[![Watch the Demo]](https://www.youtube.com/watch?v=lxVxRVy9sRs)
 
 🏗️ System Architecture
 The application is architected for stability and scalability:
